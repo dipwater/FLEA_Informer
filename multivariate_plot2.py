@@ -9,7 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 # 配置（请根据实际情况调整路径）
 # -------------------------------
 # 共同的标识名称
-PREFIX = 'Normal'
+PREFIX = 'Spall'
 # 模型路径
 MODEL_PATH = f'./checkpoints/informer_{PREFIX}_ftMS_sl500_ll50_pl50_dm512_nh8_el2_dl1_df2048_atprob_fc5_ebfixed_dtTrue_mxTrue_Exp_fixed_2/checkpoint.pth'
 # 数据路径
@@ -18,6 +18,9 @@ DATA_PATH = f'./data/FLEA/{PREFIX}.csv'
 OUTPUT_PLOT = f'./plots/prediction_{PREFIX}_multivariate.png'
 # 图像标题
 TITLE = f'{PREFIX} Multivariate Prediction Result'
+SKIP_LINES = 0
+if PREFIX == 'Jam':
+    SKIP_LINES = 9119
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
 
@@ -47,6 +50,10 @@ if target_col not in cols:
 
 print(f"✅ 特征列: {cols}")
 print(f"🎯 目标列: {target_col} (应为最后一列)")
+
+# >>>>>>>>>> Jam 忽略前 9119 行 <<<<<<<<<<
+df = df.iloc[SKIP_LINES:].reset_index(drop=True)
+print(f"已跳过前 {SKIP_LINES} 行，当前数据长度: {len(df)}")
 
 # 提取原始数据
 raw_features = df[cols].values.astype(np.float32)          # (N, 7)

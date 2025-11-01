@@ -71,31 +71,98 @@ def merge_csv_by_keywords(root_dir: str, keywords: List[str], output_filename: s
     print(f"\n✅ 合并成功！已保存至: {output_filename}")
     print(f"📊 总行数: {len(combined_df)} | 列: {list(combined_df.columns)}")
 
+
+def merge_csv_files(
+        folder_path: str,
+        output_file: str = 'merged_output.csv',
+        file_pattern: str = '*.csv',
+        include_source: bool = False,
+        encoding: str = 'utf-8',
+        ignore_index: bool = True
+) -> pd.DataFrame:
+    """
+    合并指定文件夹中的所有 CSV 文件为一个 DataFrame，并保存为新的 CSV 文件。
+
+    参数:
+        folder_path (str): 包含 CSV 文件的文件夹路径。
+        output_file (str): 输出的合并后 CSV 文件名（含路径可选），默认为 'merged_output.csv'。
+        file_pattern (str): 文件匹配模式（目前仅支持 '.csv'，保留扩展性），默认 '*.csv'。
+        include_source (bool): 是否添加一列 'source_file' 记录每行数据来自哪个文件，默认 False。
+        encoding (str): 读取和写入 CSV 文件时使用的编码格式，默认 'utf-8'。
+        ignore_index (bool): 合并时是否重置索引，默认 True。
+
+    返回:
+        pd.DataFrame: 合并后的 DataFrame。
+
+    示例:
+        df = merge_csv_files('data/', 'result.csv', include_source=True)
+    """
+    # 获取所有 .csv 文件（忽略大小写）
+    csv_files: List[str] = [
+        f for f in os.listdir(folder_path)
+        if f.lower().endswith('.csv')
+    ]
+
+    if not csv_files:
+        raise ValueError(f"在路径 '{folder_path}' 中未找到任何 CSV 文件。")
+
+    dataframes: List[pd.DataFrame] = []
+
+    for file in csv_files:
+        file_path = os.path.join(folder_path, file)
+        try:
+            df = pd.read_csv(file_path, encoding=encoding)
+            if include_source:
+                df['source_file'] = file
+            dataframes.append(df)
+        except Exception as e:
+            print(f"⚠️ 读取文件 {file_path} 时出错，已跳过：{e}")
+
+    if not dataframes:
+        raise ValueError("没有成功读取任何 CSV 文件。")
+
+    # 合并所有 DataFrame
+    merged_df = pd.concat(dataframes, ignore_index=ignore_index)
+
+    # 保存到文件
+    merged_df.to_csv(output_file, index=False, encoding=encoding)
+    print(f"✅ 成功合并 {len(dataframes)} 个 CSV 文件，结果已保存至: {output_file}")
+
+    return merged_df
+
 if __name__ == "__main__":
-    # Normal.csv
-    merge_csv_by_keywords(
-        root_dir="../data/FLEA2/2010_09_03/sdata",
-        keywords=["sine11", "sine12", "sine13", "sine15"],
-        output_filename="../data/FLEA/Normal.csv"
+    # full
+    df = merge_csv_files(
+        folder_path='../data/FLEA/',
+        output_file='../data/FLEA/full.csv',
+        include_source=True,
+        encoding='utf-8'  # 如果是中文 Windows 系统常见编码
     )
 
-    # Jam.csv
-    merge_csv_by_keywords(
-        root_dir="../data/FLEA2/2010_09_03/sdata",
-        keywords=["sine13", "sine14", "sine15"],
-        output_filename="../data/FLEA/Jam.csv"
-    )
-
-    # Position.csv
-    merge_csv_by_keywords(
-        root_dir="../data/FLEA2/2010_09_10_position_dead/sdata",
-        keywords=["trap13", "trap14", "trap24", "trap25"],
-        output_filename="../data/FLEA/Position.csv"
-    )
-
-    # Spall.csv
-    merge_csv_by_keywords(
-        root_dir="../data/FLEA2/2010_09_03/sdata",
-        keywords=["sine14", "sine24", "sine25", "sine33"],
-        output_filename="../data/FLEA/Spall.csv"
-    )
+    # # Normal.csv
+    # merge_csv_by_keywords(
+    #     root_dir="../data/FLEA2/2010_09_03/sdata",
+    #     keywords=["sine11", "sine12", "sine13", "sine15"],
+    #     output_filename="../data/FLEA/Normal.csv"
+    # )
+    #
+    # # Jam.csv
+    # merge_csv_by_keywords(
+    #     root_dir="../data/FLEA2/2010_09_03/sdata",
+    #     keywords=["sine13", "sine14", "sine15"],
+    #     output_filename="../data/FLEA/Jam.csv"
+    # )
+    #
+    # # Position.csv
+    # merge_csv_by_keywords(
+    #     root_dir="../data/FLEA2/2010_09_10_position_dead/sdata",
+    #     keywords=["trap13", "trap14", "trap24", "trap25"],
+    #     output_filename="../data/FLEA/Position.csv"
+    # )
+    #
+    # # Spall.csv
+    # merge_csv_by_keywords(
+    #     root_dir="../data/FLEA2/2010_09_03/sdata",
+    #     keywords=["sine14", "sine24", "sine25", "sine33"],
+    #     output_filename="../data/FLEA/Spall.csv"
+    # )

@@ -12,7 +12,7 @@ from datetime import datetime
 # -------------------------------
 
 # 共同的标识名称
-PREFIX = 'Normal'
+PREFIX = 'Spall'
 # 模型路径
 MODEL_PATH = f'./checkpoints/informer_{PREFIX}_ftS_sl500_ll50_pl50_dm512_nh8_el2_dl1_df2048_atprob_fc5_ebfixed_dtTrue_mxTrue_Exp_fixed_2/checkpoint.pth'
 # 数据路径
@@ -21,6 +21,9 @@ DATA_PATH = f'./data/FLEA/{PREFIX}.csv'
 OUTPUT_PLOT = f'./plots/prediction_{PREFIX}_univariate.png'
 # 图像标题
 TITLE = f'{PREFIX} Univariate Prediction Result'
+SKIP_LINES = 0
+if PREFIX == 'Jam':
+    SKIP_LINES = 9119
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu')
 
@@ -48,6 +51,10 @@ df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S.%f', errors='c
 # 检查时间间隔
 time_diff = df['date'].diff().dropna().dt.total_seconds().unique()
 print(f"时间间隔（秒）: {time_diff[:5]}")
+
+# >>>>>>>>>> Jam 忽略前 9119 行 <<<<<<<<<<
+df = df.iloc[SKIP_LINES:].reset_index(drop=True)
+print(f"已跳过前 {SKIP_LINES} 行，当前数据长度: {len(df)}")
 
 # 提取目标列
 target_col = 'Motor Y Voltage'  # 修改为你的列名

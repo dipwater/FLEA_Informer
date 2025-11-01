@@ -47,7 +47,7 @@ def parse_flea_timestamp(ts_str):
 
 def convert_flea_to_standard_time(data_path, csv_path, skip_rows=0):
     """
-    转换 FLEA .data 文件：
+    转换 FLEA_DATA .data 文件：
       - 第一列：原始时间戳 → 'YYYY-MM-DD HH:MM:SS'
       - 其余列：转为数值
     """
@@ -99,27 +99,27 @@ def batch_convert_flea(root_dir, output_dir):
 if __name__ == "__main__":
     # 输出根目录
     OUTPUT_ROOT = "../data/FLEA2/"
-    batch_convert_flea("../FLEA", OUTPUT_ROOT)
+    batch_convert_flea("../FLEA_DATA", OUTPUT_ROOT)
     # # 定义四类状态的原始 .data 文件路径（来自你的文档）
     # file_configs = [
     #     {
     #         "name": "Normal",
-    #         "path": "FLEA/2010_09_03/sdata/BatchProfile_triang14_2010_09_03_12_21_49_Nominal_Low.data",
+    #         "path": "FLEA_DATA/2010_09_03/sdata/BatchProfile_triang14_2010_09_03_12_21_49_Nominal_Low.data",
     #         "skip": 0
     #     },
     #     {
     #         "name": "Position",
-    #         "path": "FLEA/2010_09_10_position_dead/sdata/BatchProfile_sine24_2010_09_10_15_08_45_Position_t+24.38_o+0.00_s+0.00_Low.data",
+    #         "path": "FLEA_DATA/2010_09_10_position_dead/sdata/BatchProfile_sine24_2010_09_10_15_08_45_Position_t+24.38_o+0.00_s+0.00_Low.data",
     #         "skip": 0
     #     },
     #     {
     #         "name": "Jam",
-    #         "path": "FLEA/2010_09_03/sdata/BatchProfile_sine15-2m_2010_09_03_15_57_04_Jam_Low.data",
+    #         "path": "FLEA_DATA/2010_09_03/sdata/BatchProfile_sine15-2m_2010_09_03_15_57_04_Jam_Low.data",
     #         "skip": 9118  # 从第9119行开始（skip前9118行）
     #     },
     #     {
     #         "name": "Spall",
-    #         "path": "FLEA/2010_09_03/sdata/BatchProfile_sweep12_2010_09_03_16_55_42_Spall_Low.data",
+    #         "path": "FLEA_DATA/2010_09_03/sdata/BatchProfile_sweep12_2010_09_03_16_55_42_Spall_Low.data",
     #         "skip": 0
     #     }
     # ]
